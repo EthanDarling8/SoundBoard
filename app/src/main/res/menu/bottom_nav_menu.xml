@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_sound"
+        android:icon="@drawable/ic_baseline_music_note_24"
+        android:title="@string/sound" />
+
+    <item
+        android:id="@+id/navigation_addSound"
+        android:icon="@drawable/ic_baseline_add_24"
+        android:title="@string/add_sound" />
+
+</menu>
