@@ -1,5 +1,6 @@
 package com.example.soundboard.ui.sound;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,6 +30,10 @@ public class SoundFragment extends Fragment {
     private SoundViewModel soundViewModel;
     private static final String TAG = "MainActivity";
     private FragmentManager fm;
+    private RecyclerView recyclerView;
+    private RecyclerViewAdapter adapter;
+    private int columnCount = 1;
+
     private List<Sound> soundList = new ArrayList<>();
     View root;
 
@@ -55,12 +61,26 @@ public class SoundFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
+        Context context = getContext();
+
+        ViewModelProviders.of(this)
+                .get(AllSoundViewModel.class)
+                .getCourseList(context)
+                .observe(this, new Observer<List<Sound>>() {
+                    @Override
+                    public void onChanged(List<Sound> courses) {
+                        if (courses != null) {
+                            adapter.addItems(courses);
+                        }
+                    }
+                });
     }
 
     private void initRecyclerView(View view) {
         Log.d(TAG, "iniRecyclerView: init recyclerview.");
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(getContext(), soundList);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        adapter = new RecyclerViewAdapter(getContext(), soundList);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }

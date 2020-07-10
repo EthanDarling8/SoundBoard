@@ -1,11 +1,12 @@
 package com.example.soundboard.ui.dashboard;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
+import android.content.ContentResolver;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,104 +15,107 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.soundboard.R;
+import com.example.soundboard.db.AppDatabase;
+import com.example.soundboard.db.Sound;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddSoundFragment extends Fragment {
 
     private AddSoundViewModel addSoundViewModel;
     private static final String TAG = "AddSoundFragment";
-    private int soundEditID = 0;
-    private int REQ_CODE_PICK_SOUNDFILE = 0;
-    private Uri audio;
+    private List<Sound> soundList;
 
     private TextInputEditText sId, sName;
     private String sPath;
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         addSoundViewModel = ViewModelProviders.of(this).get(AddSoundViewModel.class);
         View root = inflater.inflate(R.layout.fragment_add_sound, container, false);
         final TextView textView = root.findViewById(R.id.text_addSound);
-        addSoundViewModel.getText().observe(this, new Observer<String>() {
+        addSoundViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
             }
         });
 
-        insertSound();
-
         sId = root.findViewById(R.id.text_sound_id);
         sName = root.findViewById(R.id.text_sound_name);
         sPath = "Test";
 
+        soundList = new ArrayList<>();
+
+        getSounds();
+        fillDatabase();
+
         return root;
     }
 
-    private void insertSound() {
-        getAudioFile();
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public void getSounds() {
+        ContentResolver soundResolver = requireActivity().getContentResolver();
+        File f = new File("/storage/emulated/0/Download");
+//        String filePath = Environment.getExternalStorageDirectory().getPath() + "/Download";
+        String filePath = Environment.getExternalStorageDirectory().getPath();
+        String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0 AND " + MediaStore.Audio.Media.DATA + " LIKE '" + filePath + "/%'";
+        Uri soundUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Cursor soundCursor = soundResolver.query(soundUri, null, selection, null, null);
 
-        saveAudioFile();
+        Log.d(TAG, "getSounds: " + selection);
 
-//        new Thread(new Runnable() {
-//            LiveData<List<Sound>> soundList;
-//            AppDatabase database = AppDatabase.getInstance(getContext());
-//            @Override
-//            public void run() {
-//                Sound sound = new Sound();
-//
-//                soundList = database.soundDAO().getAll();
-//
-//                List<Sound> temp = database.soundDAO().loadByID(soundEditID);
-//                if (temp.isEmpty()) {
-//                    database.soundDAO().insert(sound);
-//                } else {
-//                    database.soundDAO().delete(temp.get(0));
-//                    database.soundDAO().insert(sound);
-//                }
-//
-//                //database.clearAllTables();
-//                Log.d(TAG, "insertSound: " + sound.toString());
-//                Log.d(TAG, "------------------------------------------------");
-//            }
-//        }).start();
+        if (soundCursor != null && soundCursor.moveToFirst()) {
+            int id = soundCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+            int name = soundCursor.getColumnIndex(MediaStore.Audio.Media._ID);
+            int path = soundCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
+
+            do {
+                String soundTitle = soundCursor.getString(id);
+                long soundId = soundCursor.getLong(name);
+                String soundPath = soundCursor.getString(path);
+
+                Sound sound = new Sound(String.valueOf(soundId), soundTitle, soundPath);
+                soundList.add(sound);
+                Log.d(TAG, "temp: " + sound.toString());
+            }
+            while (soundCursor.moveToNext());
+            soundCursor.close();
+
+            Log.d(TAG, "temp: " + soundList.size());
+        }
     }
 
-    private void getAudioFile() {
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("audio/*");
-        startActivityForResult(intent, 1);
+    public void fillDatabase() {
+        new Thread(new Runnable() {
+            LiveData<List<Sound>> sounds;
+            AppDatabase database = AppDatabase.getInstance(getContext());
+
+            @Override
+            public void run() {
+                database.clearAllTables();
+
+                for (Sound s : soundList) {
+                    Sound sound = new Sound(s.id, s.name, s.path);
+                    database.soundDAO().insert(sound);
+                    Log.d("test", "Sound: " + sound.toString());
+                }
+                Log.d("test", "------------------------------------------------");
+
+                sounds = database.soundDAO().getAll();
+
+            }
+        }).start();
     }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        assert data != null;
-        audio = data.getData();
-
-        Log.d(TAG, "onActivityResult: sound file created: " + audio.getPath());
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void saveAudioFile() {
-//        try {
-//            AssetFileDescriptor afd = getContext().getAssets().openFd(audio.getPath());
-//            afd.createOutputStream().write();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-    }
-
 }
