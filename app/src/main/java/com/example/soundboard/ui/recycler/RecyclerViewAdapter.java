@@ -1,46 +1,39 @@
 package com.example.soundboard.ui.recycler;
 
-import android.Manifest;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Environment;
-import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.soundboard.MainActivity;
 import com.example.soundboard.R;
 import com.example.soundboard.db.Sound;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
+public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
     private static final String TAG = "RecyclerViewAdapter";
     private List<Sound> soundList;
     private Context context;
+    private static MediaPlayer player = new MediaPlayer();
 
-    public RecyclerViewAdapter( Context context, List<Sound> soundList) {
+    public RecyclerViewAdapter(Context context, List<Sound> soundList) {
         this.context = context;
         this.soundList = soundList;
+    }
+
+    public static void pausePlayer() {
+        player.stop();
+        player.reset();
     }
 
     @NonNull
@@ -48,6 +41,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recyclerview_list_item, parent, false);
+        player.stop();
+        player.reset();
         return new ViewHolder(view);
     }
 
@@ -63,30 +58,28 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                player.stop();
+                player.reset();
+
                 Log.d(TAG, "onClick: clicked on: " + soundList.get(position).getPath());
 
+                String fileString = soundList.get(position).getPath();
+                Uri uri = Uri.parse(fileString);
 
-                String fileString = soundList.get(0).getPath();
-                File soundFile = new File(fileString);
-                Uri uri = Uri.fromFile(soundFile);
-
-//                try {
-//                    ParcelFileDescriptor parcel = context.getContentResolver().openFileDescriptor(uri, "r", null);
-//                    fInput = new FileInputStream(parcel.getFileDescriptor());
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-
-                MediaPlayer player = new MediaPlayer();
                 try {
-                    player.setDataSource(uri.getPath());
+                    player.setDataSource(context.getApplicationContext(), uri);
                     player.prepare();
-                    player.start();
-                } catch (Exception e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
+                player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer mediaPlayer) {
+                        player.start();
+                    }
+                });
 
-                Toast.makeText(context, soundList.get(position).toString(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, soundList.get(position).toString(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -95,7 +88,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         this.soundList.clear();
         this.soundList.addAll(sounds);
         notifyDataSetChanged();
-        Log.d("test", "new Items Added: " + sounds.toString());
+        Log.d("RecyclerViewAdapter", "new Items Added: " + sounds.toString());
 
     }
 
@@ -107,6 +100,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView id, name, path;
         CardView parentLayout;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             id = itemView.findViewById(R.id.item_sound_id);
@@ -116,6 +110,4 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         }
     }
-
-
 }

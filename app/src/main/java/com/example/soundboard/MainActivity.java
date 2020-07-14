@@ -1,7 +1,6 @@
 package com.example.soundboard;
 
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,10 +16,11 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.soundboard.ui.dashboard.AddSoundFragment;
+import com.example.soundboard.ui.recycler.RecyclerViewAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AddSoundFragment.OnSoundFragmentListener {
 
     private static final int MY_PERMISSION_REQUEST = 1;
     private static final String TAG = "MainActivity";
@@ -55,16 +55,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSION_REQUEST: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                        Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
-                    } else {
-                        finish();
-                    }
+        if (requestCode == MY_PERMISSION_REQUEST) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
+                } else {
+                    finish();
                 }
             }
         }
+    }
+
+    @Override
+    public void onAdd() {
+        RecyclerViewAdapter.pausePlayer();
     }
 }

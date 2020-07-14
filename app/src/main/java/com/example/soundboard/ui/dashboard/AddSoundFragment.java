@@ -1,6 +1,7 @@
 package com.example.soundboard.ui.dashboard;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -35,9 +36,23 @@ public class AddSoundFragment extends Fragment {
     private AddSoundViewModel addSoundViewModel;
     private static final String TAG = "AddSoundFragment";
     private List<Sound> soundList;
-
     private TextInputEditText sId, sName;
     private String sPath;
+    private OnSoundFragmentListener mCallBack;
+
+    public interface OnSoundFragmentListener {
+        void onAdd();
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        if (context instanceof OnSoundFragmentListener)
+            mCallBack = (OnSoundFragmentListener) context;
+        else
+            throw new ClassCastException(context.toString() + "Must implement add sound fragment listener");
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -52,9 +67,9 @@ public class AddSoundFragment extends Fragment {
             }
         });
 
-        sId = root.findViewById(R.id.text_sound_id);
-        sName = root.findViewById(R.id.text_sound_name);
-        sPath = "Test";
+//        sId = root.findViewById(R.id.text_sound_id);
+//        sName = root.findViewById(R.id.text_sound_name);
+//        sPath = "Test";
 
         soundList = new ArrayList<>();
 
@@ -68,13 +83,13 @@ public class AddSoundFragment extends Fragment {
     public void getSounds() {
         ContentResolver soundResolver = requireActivity().getContentResolver();
         File f = new File("/storage/emulated/0/Download");
-//        String filePath = Environment.getExternalStorageDirectory().getPath() + "/Download";
         String filePath = Environment.getExternalStorageDirectory().getPath();
-        String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0 AND " + MediaStore.Audio.Media.DATA + " LIKE '" + filePath + "/%'";
+//        String filePath = Environment.getExternalStorageDirectory().getPath();
+        String selection = MediaStore.Audio.Media.IS_NOTIFICATION + " != 0 AND " + MediaStore.Audio.Media.DATA + " LIKE '" + filePath + "/%'";
         Uri soundUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor soundCursor = soundResolver.query(soundUri, null, selection, null, null);
 
-        Log.d(TAG, "getSounds: " + selection);
+        Log.d(TAG, "getSounds: selection: " + selection);
 
         if (soundCursor != null && soundCursor.moveToFirst()) {
             int id = soundCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
@@ -88,13 +103,14 @@ public class AddSoundFragment extends Fragment {
 
                 Sound sound = new Sound(String.valueOf(soundId), soundTitle, soundPath);
                 soundList.add(sound);
-                Log.d(TAG, "temp: " + sound.toString());
+                Log.d(TAG, "getSounds: sound: " + sound.toString());
             }
             while (soundCursor.moveToNext());
             soundCursor.close();
 
-            Log.d(TAG, "temp: " + soundList.size());
+            Log.d(TAG, "getSounds: sound: " + soundList.size());
         }
+        mCallBack.onAdd();
     }
 
     public void fillDatabase() {
@@ -109,9 +125,9 @@ public class AddSoundFragment extends Fragment {
                 for (Sound s : soundList) {
                     Sound sound = new Sound(s.id, s.name, s.path);
                     database.soundDAO().insert(sound);
-                    Log.d("test", "Sound: " + sound.toString());
+                    Log.d(TAG, "fillDatabase: " + sound.toString());
                 }
-                Log.d("test", "------------------------------------------------");
+                Log.d(TAG, "------------------------------------------------");
 
                 sounds = database.soundDAO().getAll();
 

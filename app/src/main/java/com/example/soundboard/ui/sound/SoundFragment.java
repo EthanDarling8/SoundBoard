@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,14 +28,11 @@ public class SoundFragment extends Fragment {
 
     private SoundViewModel soundViewModel;
     private static final String TAG = "MainActivity";
-    private FragmentManager fm;
     private RecyclerView recyclerView;
     private RecyclerViewAdapter adapter;
     private int columnCount = 1;
-
     private List<Sound> soundList = new ArrayList<>();
     View root;
-
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
