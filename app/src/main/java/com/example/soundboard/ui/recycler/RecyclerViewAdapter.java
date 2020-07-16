@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,7 @@ import com.example.soundboard.db.Sound;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
@@ -31,7 +33,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         this.soundList = soundList;
     }
 
-    public static void pausePlayer() {
+    public static void resetPlayer() {
         player.stop();
         player.reset();
     }
@@ -41,8 +43,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recyclerview_list_item, parent, false);
-        player.stop();
-        player.reset();
+        resetPlayer();
         return new ViewHolder(view);
     }
 
@@ -51,15 +52,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Log.d(TAG, "onBindViewHolder: called.");
         final Sound sound = soundList.get(position);
 
-        holder.id.setText(sound.getId());
-        holder.name.setText(sound.getName());
-        holder.path.setText(sound.getPath());
+        int duration = sound.getDuration();
+        int mns = (duration / 60000) % 60000;
+        int scs = (duration % 60000) / 1000;
 
-        holder.parentLayout.setOnClickListener(new View.OnClickListener() {
+        holder.name.setText(sound.getName());
+        holder.duration.setText(String.format(Locale.US, "%s %02d:%02d","Length:",  mns, scs));
+        holder.play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                player.stop();
-                player.reset();
+                resetPlayer();
 
                 Log.d(TAG, "onClick: clicked on: " + soundList.get(position).getPath());
 
@@ -78,8 +80,24 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         player.start();
                     }
                 });
+            }
+        });
 
-                //Toast.makeText(context, soundList.get(position).toString(), Toast.LENGTH_SHORT).show();
+        holder.pause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (player.isPlaying()) {
+                    player.pause();
+                } else {
+                    player.start();
+                }
+            }
+        });
+
+        holder.parentLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO show sound details
             }
         });
     }
@@ -98,14 +116,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView id, name, path;
+        TextView name, duration;
         CardView parentLayout;
+        Button play, pause;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            id = itemView.findViewById(R.id.item_sound_id);
             name = itemView.findViewById(R.id.item_sound_name);
-            path = itemView.findViewById(R.id.item_sound_path);
+            duration = itemView.findViewById(R.id.item_sound_duration);
+            play = itemView.findViewById(R.id.item_play_button);
+            pause = itemView.findViewById(R.id.item_pause_button);
             parentLayout = itemView.findViewById(R.id.item_parent_layout);
 
         }

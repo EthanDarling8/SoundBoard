@@ -7,4 +7,7 @@
     <string name="all">All</string>
     <string name="please_wait">Please Wait</string>
     <string name="choose">Choose an option to search for sounds</string>
+    <string name="play_sound">Play Sound</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
 </resources>

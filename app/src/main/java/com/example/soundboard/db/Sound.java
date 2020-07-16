@@ -14,11 +14,13 @@ public class Sound {
     public String id;
     public String name;
     public String path;
+    public int duration;
 
-    public Sound(String id, String name, String path) {
+    public Sound(String id, String name, String path, int duration) {
         this.id = id;
         this.name = name;
         this.path = path;
+        this.duration = duration;
     }
 
     public int get_id() {
@@ -51,6 +53,14 @@ public class Sound {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
     @NotNull

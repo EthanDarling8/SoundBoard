@@ -37,8 +37,6 @@ public class SoundFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        soundList.add(new Sound("10", "Test", "/Test/Path"));
-
         soundViewModel = ViewModelProviders.of(this).get(SoundViewModel.class);
         View root = inflater.inflate(R.layout.fragment_sound, container, false);
         final TextView textView = root.findViewById(R.id.text_sound);

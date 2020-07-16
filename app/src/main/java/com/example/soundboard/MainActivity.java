@@ -68,6 +68,6 @@ public class MainActivity extends AppCompatActivity implements AddSoundFragment.
 
     @Override
     public void onAdd() {
-        RecyclerViewAdapter.pausePlayer();
+        RecyclerViewAdapter.resetPlayer();
     }
 }

@@ -130,7 +130,7 @@ public class AddSoundFragment extends Fragment {
         ContentResolver soundResolver = requireActivity().getContentResolver();
         String selection = mediaType + " != 0 AND " + MediaStore.Audio.Media.DATA + " LIKE '" + filePath + "/%'";
         Uri soundUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor soundCursor = soundResolver.query(soundUri, null, selection, null, null);
+        Cursor soundCursor = soundResolver.query(soundUri, null, selection, null, " ARTIST asc");
 
         Log.d(TAG, "getSounds: selection: " + selection);
 
@@ -138,13 +138,15 @@ public class AddSoundFragment extends Fragment {
             int id = soundCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int name = soundCursor.getColumnIndex(MediaStore.Audio.Media._ID);
             int path = soundCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
+            int duration = soundCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
 
             do {
                 String soundTitle = soundCursor.getString(id);
                 long soundId = soundCursor.getLong(name);
                 String soundPath = soundCursor.getString(path);
+                int soundDuration = soundCursor.getInt(duration);
 
-                Sound sound = new Sound(String.valueOf(soundId), soundTitle, soundPath);
+                Sound sound = new Sound(String.valueOf(soundId), soundTitle, soundPath, soundDuration);
                 soundList.add(sound);
                 Log.d(TAG, "getSounds: sound: " + sound.toString());
             }
@@ -170,7 +172,7 @@ public class AddSoundFragment extends Fragment {
 
                 for (Sound s : soundList) {
                     progressBar.incrementProgressBy(1);
-                    Sound sound = new Sound(s.id, s.name, s.path);
+                    Sound sound = new Sound(s.id, s.name, s.path, s.duration);
                     database.soundDAO().insert(sound);
                     Log.d(TAG, "fillDatabase: " + sound.toString());
                 }
