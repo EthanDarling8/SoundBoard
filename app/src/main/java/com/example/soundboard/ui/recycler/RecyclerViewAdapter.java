@@ -88,7 +88,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         this.soundList.clear();
         this.soundList.addAll(sounds);
         notifyDataSetChanged();
-        Log.d("RecyclerViewAdapter", "new Items Added: " + sounds.toString());
+        Log.d("RecyclerViewAdapter", "new Items Added: " + sounds.toString() + "\n");
 
     }
 

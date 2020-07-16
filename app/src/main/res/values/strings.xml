@@ -2,4 +2,9 @@
     <string name="app_name">Sound Board</string>
     <string name="add_sound">Add Sound</string>
     <string name="sound">Sounds</string>
+    <string name="downloads">Downloads</string>
+    <string name="notifications">Notifications</string>
+    <string name="all">All</string>
+    <string name="please_wait">Please Wait</string>
+    <string name="choose">Choose an option to search for sounds</string>
 </resources>

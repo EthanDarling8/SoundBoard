@@ -7,12 +7,16 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,6 +43,9 @@ public class AddSoundFragment extends Fragment {
     private TextInputEditText sId, sName;
     private String sPath;
     private OnSoundFragmentListener mCallBack;
+    View root;
+    private String filePath, mediaType;
+    private ProgressBar progressBar;
 
     public interface OnSoundFragmentListener {
         void onAdd();
@@ -58,7 +65,7 @@ public class AddSoundFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         addSoundViewModel = ViewModelProviders.of(this).get(AddSoundViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_add_sound, container, false);
+        root = inflater.inflate(R.layout.fragment_add_sound, container, false);
         final TextView textView = root.findViewById(R.id.text_addSound);
         addSoundViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
@@ -73,19 +80,55 @@ public class AddSoundFragment extends Fragment {
 
         soundList = new ArrayList<>();
 
-        getSounds();
-        fillDatabase();
-
         return root;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        progressBar = root.findViewById(R.id.progress_bar);
+
+        Button btnDownloads = root.findViewById(R.id.button_downloads);
+        Button btnNotifications = root.findViewById(R.id.button_notifications);
+        Button btnAll = root.findViewById(R.id.button_all);
+
+        View.OnClickListener btnListener = new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.Q)
+            @Override
+            public void onClick(View view) {
+                int btn = view.getId();
+
+                switch (btn) {
+                    case R.id.button_downloads:
+                        filePath = Environment.getExternalStorageDirectory().getPath() + "/Download";
+                        mediaType = MediaStore.Audio.Media.IS_MUSIC;
+                        getSounds(filePath, mediaType);
+                        break;
+                    case R.id.button_notifications:
+                        filePath = Environment.getExternalStorageDirectory().getPath();
+                        mediaType = MediaStore.Audio.Media.IS_NOTIFICATION;
+                        getSounds(filePath, mediaType);
+                        break;
+                    case R.id.button_all:
+                        filePath = Environment.getExternalStorageDirectory().getPath();
+                        mediaType = MediaStore.Audio.Media.IS_MUSIC;
+                        getSounds(filePath, mediaType);
+                        break;
+                }
+                fillDatabase();
+            }
+        };
+        btnDownloads.setOnClickListener(btnListener);
+        btnNotifications.setOnClickListener(btnListener);
+        btnAll.setOnClickListener(btnListener);
+
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    public void getSounds() {
+    public void getSounds(String filePath, String mediaType) {
         ContentResolver soundResolver = requireActivity().getContentResolver();
-        File f = new File("/storage/emulated/0/Download");
-        String filePath = Environment.getExternalStorageDirectory().getPath();
-//        String filePath = Environment.getExternalStorageDirectory().getPath();
-        String selection = MediaStore.Audio.Media.IS_NOTIFICATION + " != 0 AND " + MediaStore.Audio.Media.DATA + " LIKE '" + filePath + "/%'";
+        String selection = mediaType + " != 0 AND " + MediaStore.Audio.Media.DATA + " LIKE '" + filePath + "/%'";
         Uri soundUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor soundCursor = soundResolver.query(soundUri, null, selection, null, null);
 
@@ -113,7 +156,10 @@ public class AddSoundFragment extends Fragment {
         mCallBack.onAdd();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void fillDatabase() {
+        progressBar.setMax(soundList.size());
+
         new Thread(new Runnable() {
             LiveData<List<Sound>> sounds;
             AppDatabase database = AppDatabase.getInstance(getContext());
@@ -123,6 +169,7 @@ public class AddSoundFragment extends Fragment {
                 database.clearAllTables();
 
                 for (Sound s : soundList) {
+                    progressBar.incrementProgressBy(1);
                     Sound sound = new Sound(s.id, s.name, s.path);
                     database.soundDAO().insert(sound);
                     Log.d(TAG, "fillDatabase: " + sound.toString());
@@ -130,7 +177,6 @@ public class AddSoundFragment extends Fragment {
                 Log.d(TAG, "------------------------------------------------");
 
                 sounds = database.soundDAO().getAll();
-
             }
         }).start();
     }
