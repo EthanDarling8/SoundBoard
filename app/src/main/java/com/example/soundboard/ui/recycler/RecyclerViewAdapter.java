@@ -8,7 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -26,8 +28,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private static final String TAG = "RecyclerViewAdapter";
     private List<Sound> soundList;
     private Context context;
-    private static MediaPlayer player;
+    private static MediaPlayer player = new MediaPlayer();
+    private static MediaPlayer player2 = new MediaPlayer();
     private static ClickListener clickListener;
+    private boolean looping = false;
 
     public RecyclerViewAdapter(Context context, List<Sound> soundList) {
         this.context = context;
@@ -39,7 +43,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recyclerview_list_item, parent, false);
-        resetPlayer();
         return new ViewHolder(view);
     }
 
@@ -53,28 +56,37 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         int scs = (duration % 60000) / 1000;
 
         holder.name.setText(sound.getName());
-        holder.duration.setText(String.format(Locale.US, "%s %02d:%02d", "Length:", mns, scs));
+        holder.duration.setText(String.format(Locale.US, "%01d:%02d", mns, scs));
         holder.play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                String fileString = soundList.get(position).getPath();
+                Uri uri = Uri.parse(fileString);
+
                 player = new MediaPlayer();
+
+
+                if (!looping) {
+                    try {
+                        player.reset();
+                        player.setDataSource(context.getApplicationContext(), uri);
+                        player.prepare();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mediaPlayer) {
+                            player.start();
+                        }
+                    });
+                } else {
+                    player.reset();
+                }
 
                 Log.d(TAG, "onClick: clicked on: " + soundList.get(position).getPath());
 
-                try {
-                    String fileString = soundList.get(position).getPath();
-                    Uri uri = Uri.parse(fileString);
-                    player.setDataSource(context.getApplicationContext(), uri);
-                    player.prepare();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer mediaPlayer) {
-                        player.start();
-                    }
-                });
             }
         });
 
@@ -85,6 +97,41 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     player.pause();
                 } else {
                     player.start();
+                }
+            }
+        });
+
+        holder.loop.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    looping = true;
+                    player2 = new MediaPlayer();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String fileString = soundList.get(position).getPath();
+                            Uri uri = Uri.parse(fileString);
+
+                            try {
+                                player2.reset();
+                                player2.setLooping(true);
+                                player2.setDataSource(context.getApplicationContext(), uri);
+                                player2.prepare();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            player2.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                                @Override
+                                public void onPrepared(MediaPlayer mediaPlayer) {
+                                    player2.start();
+                                }
+                            });
+                        }
+                    }).start();
+                } else {
+                    looping = false;
+                    player2.reset();
                 }
             }
         });
@@ -114,6 +161,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         TextView name, duration;
         CardView parentLayout;
         Button play, pause;
+        ToggleButton loop;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -121,6 +169,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             duration = itemView.findViewById(R.id.item_sound_duration);
             play = itemView.findViewById(R.id.item_play_button);
             pause = itemView.findViewById(R.id.item_pause_button);
+            loop = itemView.findViewById(R.id.item_loop_button);
             parentLayout = itemView.findViewById(R.id.item_parent_layout);
 
         }
@@ -128,7 +177,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     public static void resetPlayer() {
         player.stop();
-        player.reset();
     }
 
     public void setOnSoundClickListener(ClickListener clickListener) {
