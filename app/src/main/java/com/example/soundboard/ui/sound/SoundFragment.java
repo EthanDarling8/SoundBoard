@@ -11,7 +11,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,7 +22,6 @@ import com.example.soundboard.ui.recycler.RecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class SoundFragment extends Fragment {
 
@@ -31,7 +29,6 @@ public class SoundFragment extends Fragment {
     private static final String TAG = "MainActivity";
     private RecyclerView recyclerView;
     private RecyclerViewAdapter adapter;
-    private int columnCount = 1;
     private List<Sound> soundList = new ArrayList<>();
     View root;
 
@@ -55,7 +52,7 @@ public class SoundFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
 
         soundViewModel = ViewModelProviders.of(this).get(SoundViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_sound, container, false);
+        root = inflater.inflate(R.layout.fragment_sound, container, false);
         final TextView textView = root.findViewById(R.id.text_sound);
         soundViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
@@ -72,7 +69,6 @@ public class SoundFragment extends Fragment {
                 mCallBack.SoundClicked(position, v);
             }
         });
-
 
         return root;
     }

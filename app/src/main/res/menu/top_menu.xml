@@ -3,18 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/loop"
-        android:icon="@drawable/ic_baseline_loop_24"
-        android:title="@string/loop"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/overlay"
-        android:icon="@drawable/ic_baseline_add_to_photos_24"
-        android:title="@string/overlay"
-        app:showAsAction="ifRoom" />
-
-    <item
         android:id="@+id/search"
         android:icon="@drawable/ic_baseline_search_24"
         android:title="@string/search"

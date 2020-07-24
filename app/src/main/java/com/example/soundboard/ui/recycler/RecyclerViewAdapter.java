@@ -26,7 +26,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private static final String TAG = "RecyclerViewAdapter";
     private List<Sound> soundList;
     private Context context;
-    private static MediaPlayer player = new MediaPlayer();
+    private static MediaPlayer player;
     private static ClickListener clickListener;
 
     public RecyclerViewAdapter(Context context, List<Sound> soundList) {
@@ -53,18 +53,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         int scs = (duration % 60000) / 1000;
 
         holder.name.setText(sound.getName());
-        holder.duration.setText(String.format(Locale.US, "%s %02d:%02d","Length:",  mns, scs));
+        holder.duration.setText(String.format(Locale.US, "%s %02d:%02d", "Length:", mns, scs));
         holder.play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                resetPlayer();
+                player = new MediaPlayer();
 
                 Log.d(TAG, "onClick: clicked on: " + soundList.get(position).getPath());
 
-                String fileString = soundList.get(position).getPath();
-                Uri uri = Uri.parse(fileString);
-
                 try {
+                    String fileString = soundList.get(position).getPath();
+                    Uri uri = Uri.parse(fileString);
                     player.setDataSource(context.getApplicationContext(), uri);
                     player.prepare();
                 } catch (IOException e) {

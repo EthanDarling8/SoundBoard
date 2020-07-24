@@ -76,19 +76,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.loop:
-                //TODO add loop sound functionality
-                return true;
-            case R.id.overlay:
-                //TODO add overlay sound functionality
-                return true;
-            case R.id.search:
-                //TODO add search sound functionality
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        searchSounds();
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void searchSounds() {
+        //TODO add search sound functionality
     }
 
     @Override
