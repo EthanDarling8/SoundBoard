@@ -32,6 +32,9 @@ public interface SoundDAO {
     @Query("select * from Sound where id = :id")
     List<Sound> loadByID(int id);
 
+    @Query("select * from Sound where name like :search")
+    List<Sound> searchByName(String search);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void InsertSounds(ArrayList<Sound> soundList);
 }
