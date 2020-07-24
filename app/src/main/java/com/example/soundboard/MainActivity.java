@@ -4,23 +4,31 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.soundboard.db.Sound;
 import com.example.soundboard.ui.dashboard.AddSoundFragment;
 import com.example.soundboard.ui.recycler.RecyclerViewAdapter;
+import com.example.soundboard.ui.sound.SoundDetailsDialog;
+import com.example.soundboard.ui.sound.SoundFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class MainActivity extends AppCompatActivity implements AddSoundFragment.OnSoundFragmentListener {
+public class MainActivity extends AppCompatActivity
+        implements AddSoundFragment.OnSoundFragmentListener,
+        SoundFragment.OnSoundClickListener {
 
     private static final int MY_PERMISSION_REQUEST = 1;
     private static final String TAG = "MainActivity";
@@ -29,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements AddSoundFragment.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         setContentView(R.layout.activity_main);
 
         Log.d(TAG, "onCreate: started.");
@@ -69,5 +78,18 @@ public class MainActivity extends AppCompatActivity implements AddSoundFragment.
     @Override
     public void onAdd() {
         RecyclerViewAdapter.resetPlayer();
+    }
+
+    @Override
+    public void SoundClicked(int position, View v) {
+        SoundDetailsDialog soundDetailsDialog = new SoundDetailsDialog();
+        fm = getSupportFragmentManager();
+        fm.beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .add(android.R.id.content, soundDetailsDialog)
+                .addToBackStack(null)
+                .commit();
+
+        soundDetailsDialog.showSoundDetails(position, v);
     }
 }

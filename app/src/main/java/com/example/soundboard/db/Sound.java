@@ -11,16 +11,18 @@ public class Sound {
     @PrimaryKey(autoGenerate = true)
     public int _id;
 
-    public String id;
-    public String name;
-    public String path;
-    public int duration;
+    public String id, name, path, album, artist;
+    public int duration, size;
 
-    public Sound(String id, String name, String path, int duration) {
+    public Sound(String id, String name, String path, String album, String artist,
+                 int duration, int size) {
         this.id = id;
         this.name = name;
         this.path = path;
+        this.album = album;
+        this.artist = artist;
         this.duration = duration;
+        this.size = size;
     }
 
     public int get_id() {
@@ -63,14 +65,42 @@ public class Sound {
         this.duration = duration;
     }
 
+    public String getAlbum() {
+        return album;
+    }
+
+    public void setAlbum(String album) {
+        this.album = album;
+    }
+
+    public String getArtist() {
+        return artist;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
     @NotNull
     @Override
     public String toString() {
         return "Sound{" +
-                "pid=" + _id +
+                "_id=" + _id +
                 ", id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", path='" + path + '\'' +
+                ", album='" + album + '\'' +
+                ", artist='" + artist + '\'' +
+                ", duration=" + duration +
+                ", size=" + size +
                 '}';
     }
 }

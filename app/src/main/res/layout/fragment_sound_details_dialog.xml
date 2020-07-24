@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cardview_dark_background"
+    android:orientation="vertical"
+    android:padding="20dp"
+    tools:context=".ui.sound.SoundDetailsDialog">
+
+    <TextView
+        android:id="@+id/sound_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/id"
+        android:paddingBottom="10dp"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/sound_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/name"
+        android:paddingBottom="10dp"
+        android:textSize="26sp" />
+
+    <TextView
+        android:id="@+id/sound_path"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/path"
+        android:paddingBottom="10dp"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/sound_album"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/album"
+        android:paddingBottom="10dp"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/sound_artist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/artist"
+        android:paddingBottom="10dp"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/sound_duration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/duration"
+        android:paddingBottom="10dp"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/sound_size"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/size"
+        android:paddingBottom="10dp"
+        android:textSize="18sp" />
+
+
+</LinearLayout>

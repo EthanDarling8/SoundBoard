@@ -10,4 +10,11 @@
     <string name="play_sound">Play Sound</string>
     <string name="play">Play</string>
     <string name="pause">Pause</string>
+    <string name="id">ID:</string>
+    <string name="name">Name:</string>
+    <string name="path">Path:</string>
+    <string name="artist">Artist:</string>
+    <string name="album">Album:</string>
+    <string name="duration">Duration:</string>
+    <string name="size">Size:</string>
 </resources>

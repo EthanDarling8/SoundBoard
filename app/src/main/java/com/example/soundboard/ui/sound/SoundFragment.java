@@ -23,6 +23,7 @@ import com.example.soundboard.ui.recycler.RecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class SoundFragment extends Fragment {
 
@@ -33,6 +34,22 @@ public class SoundFragment extends Fragment {
     private int columnCount = 1;
     private List<Sound> soundList = new ArrayList<>();
     View root;
+
+    public OnSoundClickListener mCallBack;
+
+    public interface OnSoundClickListener {
+        void SoundClicked(int position, View v);
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        if (context instanceof OnSoundClickListener)
+            mCallBack = (OnSoundClickListener) context;
+        else
+            throw new ClassCastException(context.toString() + "Must implement sound fragment listener");
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -48,6 +65,14 @@ public class SoundFragment extends Fragment {
         });
 
         initRecyclerView(root);
+
+        adapter.setOnSoundClickListener(new RecyclerViewAdapter.ClickListener() {
+            @Override
+            public void onSoundClick(int position, View v) {
+                mCallBack.SoundClicked(position, v);
+            }
+        });
+
 
         return root;
     }

@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -139,14 +140,21 @@ public class AddSoundFragment extends Fragment {
             int name = soundCursor.getColumnIndex(MediaStore.Audio.Media._ID);
             int path = soundCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
             int duration = soundCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
+            int album = soundCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
+            int artist = soundCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            int size = soundCursor.getColumnIndex(MediaStore.Audio.Media.SIZE);
 
             do {
                 String soundTitle = soundCursor.getString(id);
                 long soundId = soundCursor.getLong(name);
                 String soundPath = soundCursor.getString(path);
                 int soundDuration = soundCursor.getInt(duration);
+                String soundAlbum = soundCursor.getString(album);
+                String soundArtist = soundCursor.getString(artist);
+                int soundSize = soundCursor.getInt(size);
 
-                Sound sound = new Sound(String.valueOf(soundId), soundTitle, soundPath, soundDuration);
+                Sound sound = new Sound(String.valueOf(soundId), soundTitle, soundPath, soundAlbum,
+                        soundArtist, soundDuration, soundSize);
                 soundList.add(sound);
                 Log.d(TAG, "getSounds: sound: " + sound.toString());
             }
@@ -172,7 +180,8 @@ public class AddSoundFragment extends Fragment {
 
                 for (Sound s : soundList) {
                     progressBar.incrementProgressBy(1);
-                    Sound sound = new Sound(s.id, s.name, s.path, s.duration);
+                    Sound sound = new Sound(s.id, s.name, s.path, s.album, s.artist,
+                            s.duration, s.size);
                     database.soundDAO().insert(sound);
                     Log.d(TAG, "fillDatabase: " + sound.toString());
                 }

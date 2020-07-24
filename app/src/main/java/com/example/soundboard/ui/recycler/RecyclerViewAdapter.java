@@ -27,15 +27,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private List<Sound> soundList;
     private Context context;
     private static MediaPlayer player = new MediaPlayer();
+    private static ClickListener clickListener;
 
     public RecyclerViewAdapter(Context context, List<Sound> soundList) {
         this.context = context;
         this.soundList = soundList;
-    }
-
-    public static void resetPlayer() {
-        player.stop();
-        player.reset();
     }
 
     @NonNull
@@ -97,7 +93,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO show sound details
+                clickListener.onSoundClick(Integer.parseInt(sound.getId()), holder.parentLayout);
             }
         });
     }
@@ -129,5 +125,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             parentLayout = itemView.findViewById(R.id.item_parent_layout);
 
         }
+    }
+
+    public static void resetPlayer() {
+        player.stop();
+        player.reset();
+    }
+
+    public void setOnSoundClickListener(ClickListener clickListener) {
+        RecyclerViewAdapter.clickListener = clickListener;
+    }
+
+    public interface ClickListener {
+        void onSoundClick(int id, View v);
     }
 }
