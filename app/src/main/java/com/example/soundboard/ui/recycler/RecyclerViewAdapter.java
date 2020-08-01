@@ -66,11 +66,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
                 player = new MediaPlayer();
 
-
                 if (!looping) {
                     try {
                         player.reset();
-                        player.setDataSource(context.getApplicationContext(), uri);
+                        player.setDataSource(String.valueOf(uri));
                         player.prepare();
                     } catch (IOException e) {
                         e.printStackTrace();
