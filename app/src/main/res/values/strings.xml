@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Sound Board</string>
-    <string name="add_sound">Add Sound</string>
+    <string name="add_sound">Add Sounds</string>
     <string name="sound">Sounds</string>
     <string name="downloads">Downloads</string>
     <string name="notifications">Notifications</string>
@@ -20,4 +20,5 @@
     <string name="overlay">Overlay</string>
     <string name="search">Search</string>
     <string name="loop">Loop</string>
+    <string name="sound_name">Sound Name</string>
 </resources>

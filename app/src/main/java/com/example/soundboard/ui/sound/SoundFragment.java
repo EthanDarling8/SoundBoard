@@ -81,12 +81,12 @@ public class SoundFragment extends Fragment {
 
         ViewModelProviders.of(this)
                 .get(AllSoundViewModel.class)
-                .getCourseList(context)
+                .getSoundList(context)
                 .observe(this, new Observer<List<Sound>>() {
                     @Override
-                    public void onChanged(List<Sound> courses) {
-                        if (courses != null) {
-                            adapter.addItems(courses);
+                    public void onChanged(List<Sound> sounds) {
+                        if (sounds != null) {
+                            adapter.addItems(sounds);
                         }
                     }
                 });

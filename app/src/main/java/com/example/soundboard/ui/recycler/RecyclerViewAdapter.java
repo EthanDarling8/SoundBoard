@@ -1,6 +1,8 @@
 package com.example.soundboard.ui.recycler;
 
 import android.content.Context;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
@@ -29,7 +31,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private List<Sound> soundList;
     private Context context;
     private static MediaPlayer player = new MediaPlayer();
-    private static MediaPlayer player2 = new MediaPlayer();
     private static ClickListener clickListener;
     private boolean looping = false;
 
@@ -51,26 +52,30 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Log.d(TAG, "onBindViewHolder: called.");
         final Sound sound = soundList.get(position);
 
+        final ColorFilter defaultFilter = holder.play.getBackground().getColorFilter();
+
         int duration = sound.getDuration();
         int mns = (duration / 60000) % 60000;
         int scs = (duration % 60000) / 1000;
+
 
         holder.name.setText(sound.getName());
         holder.duration.setText(String.format(Locale.US, "%01d:%02d", mns, scs));
         holder.play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 String fileString = soundList.get(position).getPath();
-                Uri uri = Uri.parse(fileString);
+                final Uri uri = Uri.parse(fileString);
+
+                resetPlayer();
 
                 player = new MediaPlayer();
-
                 if (!looping) {
                     try {
                         player.reset();
                         player.setDataSource(String.valueOf(uri));
                         player.prepare();
+                        holder.play.getBackground().setColorFilter(0xFFFF8800, PorterDuff.Mode.MULTIPLY);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -84,7 +89,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     player.reset();
                 }
 
-                Log.d(TAG, "onClick: clicked on: " + soundList.get(position).getPath());
+                Log.d(TAG, "play: " + soundList.get(position).getName());
 
             }
         });
@@ -94,9 +99,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             public void onClick(View view) {
                 if (player.isPlaying()) {
                     player.pause();
+                    holder.play.getBackground().setColorFilter(defaultFilter);
                 } else {
                     player.start();
+                    holder.play.getBackground().setColorFilter(0xFFFF8800, PorterDuff.Mode.MULTIPLY);
                 }
+
+                Log.d(TAG, "pause: " + soundList.get(position).getName());
+
             }
         });
 
@@ -105,33 +115,33 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b) {
                     looping = true;
-                    player2 = new MediaPlayer();
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            String fileString = soundList.get(position).getPath();
-                            Uri uri = Uri.parse(fileString);
+                    String fileString = soundList.get(position).getPath();
+                    final Uri uri = Uri.parse(fileString);
+                    resetPlayer();
 
-                            try {
-                                player2.reset();
-                                player2.setLooping(true);
-                                player2.setDataSource(context.getApplicationContext(), uri);
-                                player2.prepare();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            player2.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                                @Override
-                                public void onPrepared(MediaPlayer mediaPlayer) {
-                                    player2.start();
-                                }
-                            });
+                    player = new MediaPlayer();
+
+                    try {
+                        player.reset();
+                        player.setLooping(true);
+                        player.setDataSource(String.valueOf(uri));
+                        player.prepare();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mediaPlayer) {
+                            player.start();
                         }
-                    }).start();
+                    });
                 } else {
                     looping = false;
-                    player2.reset();
+                    player.reset();
                 }
+
+                Log.d(TAG, "loop: " + soundList.get(position).getName());
+
             }
         });
 
@@ -139,6 +149,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             @Override
             public void onClick(View view) {
                 clickListener.onSoundClick(Integer.parseInt(sound.getId()), holder.parentLayout);
+                Log.d(TAG, "details: " + soundList.get(position).getName());
             }
         });
     }
@@ -147,8 +158,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         this.soundList.clear();
         this.soundList.addAll(sounds);
         notifyDataSetChanged();
-        Log.d("RecyclerViewAdapter", "new Items Added: " + sounds.toString() + "\n");
-
+        Log.d(TAG, "new Items Added: " + sounds.toString() + "\n");
     }
 
     @Override
@@ -170,7 +180,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             pause = itemView.findViewById(R.id.item_pause_button);
             loop = itemView.findViewById(R.id.item_loop_button);
             parentLayout = itemView.findViewById(R.id.item_parent_layout);
-
         }
     }
 

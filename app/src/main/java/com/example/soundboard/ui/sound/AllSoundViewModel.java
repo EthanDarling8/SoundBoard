@@ -13,7 +13,7 @@ import java.util.List;
 public class AllSoundViewModel extends ViewModel {
     private LiveData<List<Sound>> soundList;
 
-    public LiveData<List<Sound>> getCourseList(Context c) {
+    public LiveData<List<Sound>> getSoundList(Context c) {
         if (soundList != null) {
             return soundList;
         }

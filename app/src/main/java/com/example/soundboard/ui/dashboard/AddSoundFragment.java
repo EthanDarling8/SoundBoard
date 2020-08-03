@@ -1,23 +1,17 @@
 package com.example.soundboard.ui.dashboard;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,9 +24,8 @@ import androidx.lifecycle.ViewModelProviders;
 import com.example.soundboard.R;
 import com.example.soundboard.db.AppDatabase;
 import com.example.soundboard.db.Sound;
-import com.google.android.material.textfield.TextInputEditText;
+import com.example.soundboard.ui.sound.SoundFinder;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,15 +34,16 @@ public class AddSoundFragment extends Fragment {
     private AddSoundViewModel addSoundViewModel;
     private static final String TAG = "AddSoundFragment";
     private List<Sound> soundList;
-    private TextInputEditText sId, sName;
-    private String sPath;
+    private int soundCount = 0;
     private OnSoundFragmentListener mCallBack;
-    View root;
     private String filePath, mediaType;
     private ProgressBar progressBar;
+    private SoundFinder soundFinder = new SoundFinder();
+
+    View root;
 
     public interface OnSoundFragmentListener {
-        void onAdd();
+        void onAdd(int soundCount);
     }
 
     @Override
@@ -74,10 +68,6 @@ public class AddSoundFragment extends Fragment {
                 textView.setText(s);
             }
         });
-
-//        sId = root.findViewById(R.id.text_sound_id);
-//        sName = root.findViewById(R.id.text_sound_name);
-//        sPath = "Test";
 
         soundList = new ArrayList<>();
 
@@ -104,17 +94,17 @@ public class AddSoundFragment extends Fragment {
                     case R.id.button_downloads:
                         filePath = Environment.getExternalStorageDirectory().getPath() + "/Download";
                         mediaType = MediaStore.Audio.Media.IS_MUSIC;
-                        getSounds(filePath, mediaType);
+                        soundList = soundFinder.getSounds(getActivity(), filePath, mediaType);
                         break;
                     case R.id.button_notifications:
                         filePath = Environment.getExternalStorageDirectory().getPath();
                         mediaType = MediaStore.Audio.Media.IS_NOTIFICATION;
-                        getSounds(filePath, mediaType);
+                        soundList = soundFinder.getSounds(getActivity(), filePath, mediaType);
                         break;
                     case R.id.button_all:
                         filePath = Environment.getExternalStorageDirectory().getPath();
                         mediaType = MediaStore.Audio.Media.IS_MUSIC;
-                        getSounds(filePath, mediaType);
+                        soundList = soundFinder.getSounds(getActivity(), filePath, mediaType);
                         break;
                 }
                 fillDatabase();
@@ -126,48 +116,9 @@ public class AddSoundFragment extends Fragment {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
-    public void getSounds(String filePath, String mediaType) {
-        ContentResolver soundResolver = requireActivity().getContentResolver();
-        String selection = mediaType + " != 0 AND " + MediaStore.Audio.Media.DATA + " LIKE '" + filePath + "/%'";
-        Uri soundUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor soundCursor = soundResolver.query(soundUri, null, selection, null, " ARTIST asc");
-
-        Log.d(TAG, "getSounds: selection: " + selection);
-
-        if (soundCursor != null && soundCursor.moveToFirst()) {
-            int id = soundCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-            int name = soundCursor.getColumnIndex(MediaStore.Audio.Media._ID);
-            int path = soundCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
-            int duration = soundCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
-            int album = soundCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-            int artist = soundCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            int size = soundCursor.getColumnIndex(MediaStore.Audio.Media.SIZE);
-
-            do {
-                String soundTitle = soundCursor.getString(id);
-                long soundId = soundCursor.getLong(name);
-                String soundPath = soundCursor.getString(path);
-                int soundDuration = soundCursor.getInt(duration);
-                String soundAlbum = soundCursor.getString(album);
-                String soundArtist = soundCursor.getString(artist);
-                int soundSize = soundCursor.getInt(size);
-
-                Sound sound = new Sound(String.valueOf(soundId), soundTitle, soundPath, soundAlbum,
-                        soundArtist, soundDuration, soundSize);
-                soundList.add(sound);
-                Log.d(TAG, "getSounds: sound: " + sound.toString());
-            }
-            while (soundCursor.moveToNext());
-            soundCursor.close();
-
-            Log.d(TAG, "getSounds: sound: " + soundList.size());
-        }
-        mCallBack.onAdd();
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void fillDatabase() {
+        soundCount = 0;
         progressBar.setMax(soundList.size());
 
         new Thread(new Runnable() {
@@ -188,6 +139,8 @@ public class AddSoundFragment extends Fragment {
                 Log.d(TAG, "------------------------------------------------");
 
                 sounds = database.soundDAO().getAll();
+                soundCount = database.soundDAO().getSoundCount();
+                mCallBack.onAdd(soundCount);
             }
         }).start();
     }

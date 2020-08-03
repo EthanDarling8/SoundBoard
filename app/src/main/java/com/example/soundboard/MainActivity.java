@@ -1,15 +1,14 @@
 package com.example.soundboard;
 
 import android.Manifest;
-import android.app.ActionBar;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,16 +22,19 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.example.soundboard.db.Sound;
 import com.example.soundboard.ui.dashboard.AddSoundFragment;
 import com.example.soundboard.ui.recycler.RecyclerViewAdapter;
 import com.example.soundboard.ui.sound.SoundDetailsDialog;
 import com.example.soundboard.ui.sound.SoundFragment;
+import com.example.soundboard.ui.sound.SoundSearchDialog;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
         implements AddSoundFragment.OnSoundFragmentListener,
-        SoundFragment.OnSoundClickListener {
+        SoundFragment.OnSoundClickListener,
+        SoundSearchDialog.OnSoundFragmentListener {
 
     private static final int MY_PERMISSION_REQUEST = 1;
     private static final String TAG = "MainActivity";
@@ -55,8 +57,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_sound, R.id.navigation_addSound)
                 .build();
@@ -81,7 +82,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void searchSounds() {
-        //TODO add search sound functionality
+        SoundSearchDialog searchDialog = new SoundSearchDialog();
+        searchDialog.setCancelable(true);
+        searchDialog.show(getSupportFragmentManager(), "searchDialog");
     }
 
     @Override
@@ -98,7 +101,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onAdd() {
+    public void onAdd(final int soundCount) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (soundCount > 0) {
+                    Toast toast = Toast.makeText(getApplicationContext(),
+                            String.format(Locale.US, "%d %s", soundCount, "sounds found"),
+                            Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_VERTICAL, 0, 156);
+                    toast.show();
+                } else {
+                    Toast toast = Toast.makeText(getApplicationContext(),
+                            String.format(Locale.US, "%s", " No sounds found"),
+                            Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_VERTICAL, 0, 156);
+                    toast.show();
+                }
+            }
+        });
         RecyclerViewAdapter.resetPlayer();
     }
 

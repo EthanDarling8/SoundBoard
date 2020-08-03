@@ -4,18 +4,15 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-
-import androidx.annotation.LongDef;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 
 import com.example.soundboard.R;
 import com.example.soundboard.db.AppDatabase;
@@ -23,7 +20,6 @@ import com.example.soundboard.db.Sound;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class SoundDetailsDialog extends DialogFragment {
 
