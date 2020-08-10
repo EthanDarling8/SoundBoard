@@ -105,6 +105,9 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    /**
+     * Shows the help dialog.
+     */
     private void help() {
         HelpDialog helpDialog = new HelpDialog();
         helpDialog.setCancelable(true);
