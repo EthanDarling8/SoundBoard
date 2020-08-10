@@ -6,7 +6,7 @@
     <string name="notifications">Notifications</string>
     <string name="all">All</string>
     <string name="please_wait">Please Wait</string>
-    <string name="choose">Choose an option to search for sounds</string>
+    <string name="choose">Choose a location to search for sounds</string>
     <string name="play_sound">Play Sound</string>
     <string name="play">Play</string>
     <string name="pause">Pause</string>
@@ -21,4 +21,9 @@
     <string name="search">Search</string>
     <string name="loop">Loop</string>
     <string name="sound_name">Sound Name</string>
+    <string name="help">Help</string>
+    <string name="help4">To search for a sound, tap the search button on the top to search for a sound by name.</string>
+    <string name="help3">You can then play, pause, and loop sounds.</string>
+    <string name="help2">If sounds are found they will show up under \'Sounds\'.</string>
+    <string name="help1">Tap \'Add Sounds\' on the navigation bar to find sounds on your device.</string>
 </resources>

@@ -26,23 +26,28 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Dialog that appears when searching for a sound.
+ */
 public class SoundSearchDialog extends DialogFragment {
 
+    // Fields
     private List<Sound> soundList;
-    private static final String TAG = "SoundSearchDialog";
-    private OnSoundFragmentListener mCallBack;
     private int soundCount = 0;
+
     private SoundFinder soundFinder = new SoundFinder();
+
+    private OnSoundFragmentListener mCallBack;
+    private static final String TAG = "SoundSearchDialog";
 
     View root;
 
+    // Interface for when a sound is added.
     public interface OnSoundFragmentListener {
         void onAdd(int soundCount);
     }
 
-    public SoundSearchDialog() {
-        // Required empty public constructor
-    }
+    public SoundSearchDialog() {}
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -75,7 +80,8 @@ public class SoundSearchDialog extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        View searchView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_sound_search_dialog, (ViewGroup) getView(), false);
+        View searchView = LayoutInflater.from(getContext())
+                .inflate(R.layout.fragment_sound_search_dialog, (ViewGroup) getView(), false);
 
         final TextInputEditText searchInput = searchView.findViewById(R.id.search_input);
 
@@ -103,6 +109,9 @@ public class SoundSearchDialog extends DialogFragment {
         return builder.create();
     }
 
+    /**
+     * Fills the room database with sounds based off of the given search query.
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void fillDatabase() {
         soundCount = 0;

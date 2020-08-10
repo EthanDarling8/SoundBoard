@@ -24,6 +24,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.soundboard.ui.dashboard.AddSoundFragment;
 import com.example.soundboard.ui.recycler.RecyclerViewAdapter;
+import com.example.soundboard.ui.sound.HelpDialog;
 import com.example.soundboard.ui.sound.SoundDetailsDialog;
 import com.example.soundboard.ui.sound.SoundFragment;
 import com.example.soundboard.ui.sound.SoundSearchDialog;
@@ -36,9 +37,11 @@ public class MainActivity extends AppCompatActivity
         SoundFragment.OnSoundClickListener,
         SoundSearchDialog.OnSoundFragmentListener {
 
+    // Fields
     private static final int MY_PERMISSION_REQUEST = 1;
-    private static final String TAG = "MainActivity";
+
     private FragmentManager fm;
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity
 
         Log.d(TAG, "onCreate: started.");
 
+        // Check for storage permissions
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSION_REQUEST);
@@ -56,6 +60,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+        // Initialize bottom navigation and app bar.
         BottomNavigationView navView = findViewById(R.id.nav_view);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -77,15 +82,35 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        searchSounds();
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.search:
+                searchSounds();
+                return true;
+            case R.id.help:
+                help();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 
+    /**
+     * Starts a sound search event.
+     */
     private void searchSounds() {
         SoundSearchDialog searchDialog = new SoundSearchDialog();
         searchDialog.setCancelable(true);
         searchDialog.show(getSupportFragmentManager(), "searchDialog");
     }
+
+
+    private void help() {
+        HelpDialog helpDialog = new HelpDialog();
+        helpDialog.setCancelable(true);
+        helpDialog.show(getSupportFragmentManager(), "helpDialog");
+    }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

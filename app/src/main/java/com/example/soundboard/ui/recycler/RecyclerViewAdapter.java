@@ -25,14 +25,19 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Recycler view to display all of the sounds in the room database.
+ */
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
-    private static final String TAG = "RecyclerViewAdapter";
+    // Fields
     private List<Sound> soundList;
-    private Context context;
     private static MediaPlayer player = new MediaPlayer();
-    private static ClickListener clickListener;
     private boolean looping = false;
+
+    private Context context;
+    private static ClickListener clickListener;
+    private static final String TAG = "RecyclerViewAdapter";
 
     public RecyclerViewAdapter(Context context, List<Sound> soundList) {
         this.context = context;
@@ -154,6 +159,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         });
     }
 
+    /**
+     * Adds sounds to the recycler view.
+     * @param sounds List<Sound>
+     */
     public void addItems(List<Sound> sounds) {
         this.soundList.clear();
         this.soundList.addAll(sounds);
@@ -161,6 +170,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Log.d(TAG, "new Items Added: " + sounds.toString() + "\n");
     }
 
+    /**
+     * Returns the size of the List of sounds.
+     * @return int
+     */
     @Override
     public int getItemCount() {
         return soundList.size();
@@ -183,6 +196,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
     }
 
+    /**
+     * Stops the media player.
+     */
     public static void resetPlayer() {
         player.stop();
     }
@@ -191,6 +207,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         RecyclerViewAdapter.clickListener = clickListener;
     }
 
+    /**
+     * Interface for when an item in the recycler view is clicked on.
+     */
     public interface ClickListener {
         void onSoundClick(int id, View v);
     }

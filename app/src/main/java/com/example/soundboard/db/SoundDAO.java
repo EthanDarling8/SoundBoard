@@ -33,5 +33,5 @@ public interface SoundDAO {
     List<Sound> loadByID(int id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void InsertSounds(ArrayList<Sound> soundList);
+    void insertSounds(ArrayList<Sound> soundList);
 }

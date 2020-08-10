@@ -29,19 +29,28 @@ import com.example.soundboard.ui.sound.SoundFinder;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Represents a fragment for adding sounds from a particular folder.
+ */
 public class AddSoundFragment extends Fragment {
 
-    private AddSoundViewModel addSoundViewModel;
-    private static final String TAG = "AddSoundFragment";
+    // Fields
     private List<Sound> soundList;
-    private int soundCount = 0;
-    private OnSoundFragmentListener mCallBack;
     private String filePath, mediaType;
+    private int soundCount = 0;
+
     private ProgressBar progressBar;
     private SoundFinder soundFinder = new SoundFinder();
 
+    private OnSoundFragmentListener mCallBack;
+    private static final String TAG = "AddSoundFragment";
+
     View root;
 
+    /**
+     * Interface used to add sounds to the room database
+     */
     public interface OnSoundFragmentListener {
         void onAdd(int soundCount);
     }
@@ -59,7 +68,7 @@ public class AddSoundFragment extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        addSoundViewModel = ViewModelProviders.of(this).get(AddSoundViewModel.class);
+        AddSoundViewModel addSoundViewModel = ViewModelProviders.of(this).get(AddSoundViewModel.class);
         root = inflater.inflate(R.layout.fragment_add_sound, container, false);
         final TextView textView = root.findViewById(R.id.text_addSound);
         addSoundViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
@@ -94,28 +103,32 @@ public class AddSoundFragment extends Fragment {
                     case R.id.button_downloads:
                         filePath = Environment.getExternalStorageDirectory().getPath() + "/Download";
                         mediaType = MediaStore.Audio.Media.IS_MUSIC;
-                        soundList = soundFinder.getSounds(getActivity(), filePath, mediaType);
+                        soundList = soundFinder.getSounds(requireActivity(), filePath, mediaType);
                         break;
                     case R.id.button_notifications:
                         filePath = Environment.getExternalStorageDirectory().getPath();
                         mediaType = MediaStore.Audio.Media.IS_NOTIFICATION;
-                        soundList = soundFinder.getSounds(getActivity(), filePath, mediaType);
+                        soundList = soundFinder.getSounds(requireActivity(), filePath, mediaType);
                         break;
                     case R.id.button_all:
                         filePath = Environment.getExternalStorageDirectory().getPath();
                         mediaType = MediaStore.Audio.Media.IS_MUSIC;
-                        soundList = soundFinder.getSounds(getActivity(), filePath, mediaType);
+                        soundList = soundFinder.getSounds(requireActivity(), filePath, mediaType);
                         break;
                 }
                 fillDatabase();
             }
         };
+
         btnDownloads.setOnClickListener(btnListener);
         btnNotifications.setOnClickListener(btnListener);
         btnAll.setOnClickListener(btnListener);
 
     }
 
+    /**
+     * Fills database with sounds from the selected location.
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void fillDatabase() {
         soundCount = 0;

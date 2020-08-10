@@ -15,10 +15,20 @@ import com.example.soundboard.db.Sound;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a search function to find a sound by a string of text.
+ */
 public class SoundFinder extends Fragment {
 
     private List<Sound> soundList = new ArrayList<>();
 
+    /**
+     * Gets the sounds in a given location on the device.
+     * @param activity Activity
+     * @param filePath String
+     * @param mediaType String
+     * @return List<Sound>
+     */
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public List<Sound> getSounds(Activity activity, String filePath, String mediaType) {
         ContentResolver soundResolver = activity.getContentResolver();
@@ -30,6 +40,13 @@ public class SoundFinder extends Fragment {
         return soundList;
     }
 
+    /**
+     * Searches for sounds that are like the query that the user inputs.
+     * @param activity Activity
+     * @param searchString String
+     * @param mediaType String
+     * @return List<Sound>
+     */
     public List<Sound> searchSounds(Activity activity, String searchString, String mediaType) {
         ContentResolver soundResolver = activity.getContentResolver();
         String selection = mediaType + " != 0 AND " + MediaStore.Audio.Media.TITLE + " LIKE '" + "%" + searchString + "%'";
@@ -40,6 +57,11 @@ public class SoundFinder extends Fragment {
         return soundList;
     }
 
+    /**
+     * Goes through the MediaStore and finds each detail on the Sounds on the device. It then
+     * populates the List of sounds.
+     * @param soundCursor Cursor
+     */
     private void cursorLoop(Cursor soundCursor) {
         if (soundCursor != null && soundCursor.moveToFirst()) {
             int id = soundCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);

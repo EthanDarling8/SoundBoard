@@ -23,17 +23,27 @@ import com.example.soundboard.ui.recycler.RecyclerViewAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fragment that holds the recycler view and all of it's information.
+ */
 public class SoundFragment extends Fragment {
 
+    // Fields
+    private List<Sound> soundList = new ArrayList<>();
+
     private SoundViewModel soundViewModel;
-    private static final String TAG = "MainActivity";
     private RecyclerView recyclerView;
     private RecyclerViewAdapter adapter;
-    private List<Sound> soundList = new ArrayList<>();
-    View root;
 
     public OnSoundClickListener mCallBack;
+    private static final String TAG = "MainActivity";
 
+    View root;
+
+
+    /**
+     * Interface fore when a sounds is clicked on.
+     */
     public interface OnSoundClickListener {
         void SoundClicked(int position, View v);
     }
@@ -92,6 +102,10 @@ public class SoundFragment extends Fragment {
                 });
     }
 
+    /**
+     * Initializes the recycler view and it's adapter.
+     * @param view View
+     */
     private void initRecyclerView(View view) {
         Log.d(TAG, "iniRecyclerView: init recyclerview.");
         recyclerView = view.findViewById(R.id.recycler_view);

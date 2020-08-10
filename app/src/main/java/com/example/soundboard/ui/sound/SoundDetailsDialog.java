@@ -21,15 +21,19 @@ import com.example.soundboard.db.Sound;
 import java.util.List;
 import java.util.Locale;
 
+
+/**
+ * Dialog Fragment that displays all of the details of a particular sound.
+ */
 public class SoundDetailsDialog extends DialogFragment {
 
-    View root;
+    // Fields
     private List<Sound> sound;
     private TextView id, name, path, album, artist, duration, size;
 
-    public SoundDetailsDialog() {
-        // Required empty public constructor
-    }
+    View root;
+
+    public SoundDetailsDialog() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +70,11 @@ public class SoundDetailsDialog extends DialogFragment {
         return builder.create();
     }
 
+    /**
+     * Accesses the room database for a given sound by position and formats it's details in a list.
+     * @param position int
+     * @param v View
+     */
     public void showSoundDetails(final int position, View v) {
         new Thread(new Runnable() {
             @Override
