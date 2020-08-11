@@ -1,3 +1,9 @@
+/*
+  Author: Ethan Darling
+  Class: CS 3270
+  MainActivity.java
+ */
+
 package com.example.soundboard;
 
 import android.Manifest;

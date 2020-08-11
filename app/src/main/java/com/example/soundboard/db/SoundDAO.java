@@ -1,3 +1,9 @@
+/*
+  Author: Ethan Darling
+  Class: CS 3270
+  SoundDAO.java
+ */
+
 package com.example.soundboard.db;
 
 import androidx.lifecycle.LiveData;

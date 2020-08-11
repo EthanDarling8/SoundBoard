@@ -1,3 +1,9 @@
+/*
+  Author: Ethan Darling
+  Class: CS 3270
+  AppDatabase.java
+ */
+
 package com.example.soundboard.db;
 
 import android.content.Context;

@@ -1,3 +1,9 @@
+/*
+  Author: Ethan Darling
+  Class: CS 3270
+  SoundViewModel.java
+ */
+
 package com.example.soundboard.ui.sound;
 
 import androidx.lifecycle.LiveData;

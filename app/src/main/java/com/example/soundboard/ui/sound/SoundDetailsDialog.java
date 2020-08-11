@@ -1,3 +1,9 @@
+/*
+  Author: Ethan Darling
+  Class: CS 3270
+  SoundDetailsDialog.java
+ */
+
 package com.example.soundboard.ui.sound;
 
 import android.app.AlertDialog;

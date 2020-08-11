@@ -1,3 +1,9 @@
+/*
+  Author: Ethan Darling
+  Class: CS 3270
+  RecyclerViewAdapter.java
+ */
+
 package com.example.soundboard.ui.recycler;
 
 import android.content.Context;

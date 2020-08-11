@@ -1,3 +1,9 @@
+/*
+  Author: Ethan Darling
+  Class: CS 3270
+  Sound.java
+ */
+
 package com.example.soundboard.db;
 
 import androidx.room.Entity;
